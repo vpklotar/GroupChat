@@ -45,9 +45,10 @@ public class ChatGroup extends Chat {
         }
     }
 
-    public void BroadcastMessage(String message) {
+    public void BroadcastMessage(String player, String message) {
+        this.core.info(message);
         for (String p : this.Players) {
-            this.SendMessage(p, message);
+            this.SendMessage(player, this.name, p, message);
         }
     }
 
@@ -108,7 +109,7 @@ public class ChatGroup extends Chat {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if (this.Players.contains(event.getPlayer().getName()) && this.core.PlayerWritingGroup.get(event.getPlayer().getName()).equals(this.name)) {
-            this.BroadcastMessage(this.Syntaxinate(event.getPlayer(), event.getMessage()));
+            this.BroadcastMessage(event.getPlayer().getName(), this.Syntaxinate(event.getPlayer(), event.getMessage()));
             event.setCancelled(true);
         }
     }

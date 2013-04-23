@@ -5,6 +5,7 @@
 package groupchat;
 
 import Commands.G;
+import Commands.mute;
 import groupcore.Config;
 import groupcore.GroupCoreAPI;
 import java.util.ArrayList;
@@ -73,6 +74,8 @@ public class Core extends JavaPlugin implements Listener {
     public void SetupConfigs(){
         this.config = this.api.GetExtentionConfig(this, "config");
         
+        this.config.setDefault("ChatInServer", "true");
+        
         this.config.setDefault("Format.ChatColorsEnabled", "true");
         this.config.setDefault("Format.Syntax", "(%level%)&f[&b%group%&f] &a%username%: &f%message%");
         
@@ -114,8 +117,8 @@ public class Core extends JavaPlugin implements Listener {
     }
     
     private void setupCommands() {
-        G g = new G(this);
-        this.api.GetCommandHandler().RegisterCommand("/G", g);
+        this.api.GetCommandHandler().RegisterCommand("/G", new G(this));
+        this.api.GetCommandHandler().RegisterCommand("/mute", new mute(this));
         //this.api.GetCommandHandler().RegisterCommand("G", g);
     }
     
@@ -169,6 +172,6 @@ public class Core extends JavaPlugin implements Listener {
     }
 
     public GroupPlayer getPlayer(String p) {
-        
+        return new GroupPlayer(this, p); // Debug test
     }
 }
