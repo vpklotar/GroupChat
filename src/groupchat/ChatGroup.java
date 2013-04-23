@@ -44,7 +44,14 @@ public class ChatGroup extends Chat {
             }
         }
     }
-
+    
+    public void BroadcastMessage(String player, String message, boolean syntaxinate) {
+        if(syntaxinate) {
+            message = this.Syntaxinate(this.core.getServer().getPlayer(player), message);
+        }
+        this.BroadcastMessage(player, message);
+    }
+    
     public void BroadcastMessage(String player, String message) {
         this.core.info(message);
         for (String p : this.Players) {
@@ -101,16 +108,8 @@ public class ChatGroup extends Chat {
     public void SetupPlayers() {
         for (String s : this.Players) {
             if (this.core.getServer().getPlayer(s).isOnline()) {
-                this.Join(this.core.getServer().getPlayer(s), false);
+                this.Join(this.core.players.get(s), false);
             }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (this.Players.contains(event.getPlayer().getName()) && this.core.PlayerWritingGroup.get(event.getPlayer().getName()).equals(this.name)) {
-            this.BroadcastMessage(event.getPlayer().getName(), this.Syntaxinate(event.getPlayer(), event.getMessage()));
-            event.setCancelled(true);
         }
     }
 
@@ -123,7 +122,7 @@ public class ChatGroup extends Chat {
     }
     
     public void Listen(String p){
-        if (this.core.PlayerCurrentGroups.get(p) == null) {
+        /*if (this.core.PlayerCurrentGroups.get(p) == null) {
             this.core.PlayerCurrentGroups.put(p, new ArrayList<String>());
         }
         
@@ -133,13 +132,17 @@ public class ChatGroup extends Chat {
         
         if(!this.core.PlayerCurrentGroups.get(p).contains(this.name)){
             this.core.PlayerCurrentGroups.get(p).add(this.name);
+        }*/
+        
+        if (!this.Players.contains(p)) {
+            this.Players.add(p);
         }
         
         this.Save();
     }
 
-    public void Join(Player p, boolean Message) {
-        if (this.core.PlayerCurrentGroups.get(p.getName()) == null) {
+    public void Join(GroupPlayer p, boolean Message) {
+        /*if (this.core.PlayerCurrentGroups.get(p.name) == null) {
             this.core.PlayerCurrentGroups.put(p.getName(), new ArrayList<String>());
         }
 
@@ -154,33 +157,41 @@ public class ChatGroup extends Chat {
         
         if(!this.core.PlayerCurrentGroups.get(p.getName()).contains(this.name)){
             this.core.PlayerCurrentGroups.get(p.getName()).add(this.name);
+        }*/
+        
+        if(!this.Players.contains(p.name)){
+            this.Players.add(p.name);
         }
+        
         
         this.Save();
 
         if (Message) {
-            p.sendMessage(this.Syntaxinate(p, this.config.getString("Group.Message.Join")));
+            p.sendMessage("", this.name, this.Syntaxinate(this.core.getServer().getPlayer(p.name), this.config.getString("Group.Message.Join")));
         }
     }
     
-    public void Leave(Player p, boolean Message){
-        this.core.PlayerCurrentGroups.get(p.getName()).remove(this.name);
-
-        if (!this.core.PlayerWritingGroup.containsKey(p.getName()) || Message) {
-            this.core.PlayerWritingGroup.put(p.getName(), this.core.DefaultChatGroup);
+    public void Leave(GroupPlayer p, boolean Message){
+        p.chatGroups.remove(this.name);
+        
+        if(p.writingGroup.equals(this.name)) {
+            if(p.chatGroups.size() < 1){
+                p.chatGroups.add(name);
+            }
+            p.writingGroup = p.chatGroups.get(0); // If the player had this as it's writing group go back to the first in his index
         }
         
         this.Save();
 
-        if (Message && p.isOnline()) {
-            p.sendMessage(this.Syntaxinate(p, this.config.getString("Group.Message.Leave")));
+        if (Message && p.Online()) {
+            p.sendMessage("", this.name, this.Syntaxinate(this.core.getServer().getPlayer(p.name), this.config.getString("Group.Message.Leave")));
         }
     }
     
     public void Delete(Player p){
         this.core.ChatGroups.remove(this.name);
         for(String s : this.Players){
-            this.Leave(this.core.getServer().getPlayer(s), true);
+            this.Leave(this.core.players.get(s), true);
         }
         new File(this.config.config.getCurrentPath()).delete();
         p.sendMessage(ChatColor.RED+"Group "+this.name+" removed as requested!");

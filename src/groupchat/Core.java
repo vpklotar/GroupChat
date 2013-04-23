@@ -25,9 +25,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Core extends JavaPlugin implements Listener {
     public GroupCoreAPI api;
     public Config config;
-    public HashMap<String, ArrayList<String>> PlayerCurrentGroups = new HashMap<>();
-    public HashMap<String, String> PlayerWritingGroup = new HashMap<>();
+    //public HashMap<String, ArrayList<String>> PlayerCurrentGroups = new HashMap<>();
+    //public HashMap<String, String> PlayerWritingGroup = new HashMap<>();
     public HashMap<String, ChatGroup> ChatGroups = new HashMap<>();
+    public HashMap<String, GroupPlayer> players = new HashMap<>();
     public String DefaultChatGroup;
     public int DefaultLevel = 1;
     
@@ -59,12 +60,9 @@ public class Core extends JavaPlugin implements Listener {
             }
             this.config.SetList("Groups.ChatGroups", s);
             
-            for(String name : this.PlayerCurrentGroups.keySet()){
-                this.config.SetList("Players.List."+name, this.PlayerCurrentGroups.get(name));
-            }
-            
-            for(String name : this.PlayerWritingGroup.keySet()){
-                this.config.setValue("Players."+name, this.PlayerWritingGroup.get(name));
+            for(String name : this.players.keySet()) {
+                GroupPlayer p = this.players.get(name);
+                p.Save();
             }
             
             this.config.save();
@@ -104,7 +102,7 @@ public class Core extends JavaPlugin implements Listener {
     
     public void setupPlayers() {
         for(Player p : this.getServer().getOnlinePlayers()){
-            if(!this.config.config.contains("Players.List."+p.getName()) || this.config.GetList("Players.List."+p.getName()).isEmpty()){
+            /*if(!this.config.config.contains("Players.List."+p.getName()) || this.config.GetList("Players.List."+p.getName()).isEmpty()){
                 this.ChatGroups.get(this.DefaultChatGroup).Join(p, true);
             }else{
                 for(String s : this.config.GetList("Players.List."+p.getName())){
@@ -112,7 +110,8 @@ public class Core extends JavaPlugin implements Listener {
                 }
                 
                 this.PlayerWritingGroup.put(p.getName(), this.config.getString("Players."+p.getName()));
-            }
+            }*/
+            this.players.put(p.getName(), new GroupPlayer(this, p.getName()));
         }
     }
     
@@ -144,7 +143,7 @@ public class Core extends JavaPlugin implements Listener {
         ArrayList<ChatGroup> r = new ArrayList<>();
         
         for(String s : this.ChatGroups.keySet()){
-            if(!this.PlayerCurrentGroups.get(p.getName()).contains(s) && this.ChatGroups.get(s).HasAccess(p)) {
+            if(!this.players.get(p.getName()).chatGroups.contains(s) && this.ChatGroups.get(s).HasAccess(p)) {
                 r.add(this.ChatGroups.get(s));
             }
         }
@@ -169,9 +168,5 @@ public class Core extends JavaPlugin implements Listener {
         }
         
         return 1;
-    }
-
-    public GroupPlayer getPlayer(String p) {
-        return new GroupPlayer(this, p); // Debug test
     }
 }

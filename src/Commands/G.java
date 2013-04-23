@@ -44,7 +44,7 @@ public class G implements GroupCommand {
                             // In case of success:
                             ChatGroup cg = new ChatGroup(this.core, args.get(1));
                             this.core.ChatGroups.put(args.get(1), cg);
-                            cg.Join(pcpe.getPlayer(), true);
+                            cg.Join(this.core.players.get(pcpe.getPlayer().getName()), true);
                         } else {
                             pcpe.getPlayer().sendMessage(ChatColor.RED + "That group already exsist!");
                         }
@@ -59,7 +59,7 @@ public class G implements GroupCommand {
                     if (args.size() >= 2) {
                         if (this.core.ChatGroups.containsKey(args.get(1))) {
                             // In case of success:
-                            this.core.ChatGroups.get(args.get(1)).Join(pcpe.getPlayer(), true);
+                            this.core.ChatGroups.get(args.get(1)).Join(this.core.players.get(pcpe.getPlayer().getName()), true);
                         } else {
                             pcpe.getPlayer().sendMessage(ChatColor.RED + "That group doesn't exsist!");
                         }
@@ -90,7 +90,7 @@ public class G implements GroupCommand {
                     if (this.core.api.Has(pcpe.getPlayer(), "groupchat.group.leave")) {
                         if (this.core.ChatGroups.containsKey(args.get(1))) {
                             // In case of success:
-                            this.core.ChatGroups.get(args.get(1)).Leave(pcpe.getPlayer(), true);
+                            this.core.ChatGroups.get(args.get(1)).Leave(this.core.players.get(pcpe.getPlayer().getName()), true);
                         } else {
                             pcpe.getPlayer().sendMessage(ChatColor.RED + "That group doesn't exsist!");
                         }
@@ -109,7 +109,7 @@ public class G implements GroupCommand {
     public void ListPlayerGroups(Player p) {
         p.sendMessage(ChatColor.GOLD + "---" + ChatColor.BLUE + "Current groups" + ChatColor.GOLD + "---");
 
-        for (String group : this.core.PlayerCurrentGroups.get(p.getName())) {
+        for (String group : this.core.players.get(p.getName()).chatGroups) {
             p.sendMessage(group);
         }
     }

@@ -27,6 +27,6 @@ public class Chat implements Listener{
     }
     
     public void SendMessage(String player, String group, String to, String message){
-        this.SendMessage(player, group, this.core.getPlayer(to), message);
+        this.SendMessage(player, group, this.core.players.get(to), message);
     }
 }

@@ -8,29 +8,39 @@ import groupcore.Config;
 import java.util.ArrayList;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 /**
  *
  * @author Tim
  */
-public class GroupPlayer {
+public class GroupPlayer implements Listener {
     private Config config;
     private Core core;
-    private String name = "";
+    public String name = "";
     private ArrayList<String> mutedPlayers = new ArrayList<String>();
     private ArrayList<String> mutedGroups = new ArrayList<String>();
+    public ArrayList<String> chatGroups = new ArrayList<String>();
+    public String writingGroup = "";
     
     public GroupPlayer(Core core, String name) {
         this.core = core;
         this.name = name;
+        this.writingGroup = this.core.DefaultChatGroup;
+        this.core.getServer().getPluginManager().registerEvents(this, core);
+        
         this.setupConfigs();
     }
     
     private void setupConfigs() {
         this.config = this.core.api.GetExtentionConfig(this.core, "Players/"+this.name);
         
+        this.config.setDefault("WritingGroup", writingGroup);
         this.config.SetDefaultList("muted.players", mutedPlayers);
         this.config.SetDefaultList("muted.groups", mutedGroups);
+        this.config.SetDefaultList("ChatGroups", chatGroups);
         
         this.config.save();
         
@@ -39,11 +49,24 @@ public class GroupPlayer {
     }
     
     public void Save() {
+        this.config.setValue("WritingGroup", writingGroup);
         this.config.SetList("muted.players", mutedPlayers);
         this.config.SetList("muted.groups", mutedGroups);
+        this.config.SetList("ChatGroups", chatGroups);
         
         this.config.save();
     }
+    
+    // Events
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        if(event.getPlayer().getName().equals(this.name)) {
+            this.core.ChatGroups.get(this.writingGroup).BroadcastMessage(event.getPlayer().getName(), event.getMessage(), true);
+            event.setCancelled(true);
+        }
+    }
+     
+     // End of events
     
     void sendMessage(String player, String group, String message) {
         if(this.Online() && !this.mutedPlayers.contains(player) && !this.mutedGroups.contains(group)) { // If the player is online and the origin of the message isn't muted proceed
@@ -90,5 +113,7 @@ public class GroupPlayer {
         }
         this.Save();
     }
+    
+    
     
 }
