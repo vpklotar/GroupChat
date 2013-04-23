@@ -20,13 +20,13 @@ public class Chat implements Listener{
         this.core.getServer().getPluginManager().registerEvents(this, core);
     }
     
-    public void SendMessage(Player p, String message){
+    public void SendMessage(GroupPlayer p, String message){
         if(p != null){
-            p.sendMessage(message);
+            p.message(message);
         }
     }
     
     public void SendMessage(String p, String message){
-        this.SendMessage(this.core.getServer().getPlayer(p), message);
+        this.SendMessage(this.core.getPlayer(p), message);
     }
 }

@@ -167,4 +167,8 @@ public class Core extends JavaPlugin implements Listener {
         
         return 1;
     }
+
+    public GroupPlayer getPlayer(String p) {
+        
+    }
 }
