@@ -1,0 +1,5 @@
+name: GroupChat
+version: 1.0.1
+author: Tim
+
+main: groupchat.Core
