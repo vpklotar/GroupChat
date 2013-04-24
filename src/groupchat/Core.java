@@ -8,6 +8,7 @@ import Commands.G;
 import Commands.mute;
 import groupcore.Config;
 import groupcore.GroupCoreAPI;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -41,8 +42,8 @@ public class Core extends JavaPlugin implements Listener {
             new PlayerListener(this);
             
             this.SetupConfigs();
-            this.SetupChatGroups();
             this.setupPlayers();
+            this.SetupChatGroups();
             this.setupCommands();
             
         }else{
@@ -101,6 +102,7 @@ public class Core extends JavaPlugin implements Listener {
     }
     
     public void setupPlayers() {
+        // Load all online players
         for(Player p : this.getServer().getOnlinePlayers()){
             /*if(!this.config.config.contains("Players.List."+p.getName()) || this.config.GetList("Players.List."+p.getName()).isEmpty()){
                 this.ChatGroups.get(this.DefaultChatGroup).Join(p, true);
@@ -111,6 +113,7 @@ public class Core extends JavaPlugin implements Listener {
                 
                 this.PlayerWritingGroup.put(p.getName(), this.config.getString("Players."+p.getName()));
             }*/
+            
             this.players.put(p.getName(), new GroupPlayer(this, p.getName()));
         }
     }

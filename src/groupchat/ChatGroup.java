@@ -36,11 +36,16 @@ public class ChatGroup extends Chat {
         this.SetupConfigs();
         
         if("true".equals(this.core.config.getString("Groups.AutoJoinGroupByLevel"))){
-            for(Player p : this.core.getServer().getOnlinePlayers()){
+            /*for(Player p : this.core.getServer().getOnlinePlayers()){
                 this.Listen(p.getName());
             }
             for(OfflinePlayer p : this.core.getServer().getOfflinePlayers()){
                 this.Listen(p.getName());
+            }*/
+            
+            for(String n : this.core.players.keySet()) {
+                GroupPlayer p = this.core.players.get(n);
+                this.Listen(p);
             }
         }
     }
@@ -64,7 +69,9 @@ public class ChatGroup extends Chat {
     }
 
     public void AddPlayer(String p) {
-        this.Players.add(p);
+        if(!this.Players.contains(p)) {
+            this.Players.add(p);
+        }
     }
 
     public String Syntaxinate(Player p, String message) {
@@ -121,7 +128,7 @@ public class ChatGroup extends Chat {
         return true;
     }
     
-    public void Listen(String p){
+    public void Listen(GroupPlayer p){
         /*if (this.core.PlayerCurrentGroups.get(p) == null) {
             this.core.PlayerCurrentGroups.put(p, new ArrayList<String>());
         }
@@ -134,9 +141,11 @@ public class ChatGroup extends Chat {
             this.core.PlayerCurrentGroups.get(p).add(this.name);
         }*/
         
-        if (!this.Players.contains(p)) {
-            this.Players.add(p);
-        }
+        this.AddPlayer(p.name);
+        
+        /*if(!p.chatGroups.contains(this.name)) {
+            p.chatGroups.add(this.name);
+        }*/
         
         this.Save();
     }
@@ -159,12 +168,17 @@ public class ChatGroup extends Chat {
             this.core.PlayerCurrentGroups.get(p.getName()).add(this.name);
         }*/
         
-        if(!this.Players.contains(p.name)){
-            this.Players.add(p.name);
+        this.AddPlayer(p.name);
+        
+        if(!p.chatGroups.contains(this.name))
+        {
+            p.chatGroups.add(this.name);
         }
+        p.writingGroup = this.name;
         
         
         this.Save();
+        p.Save();
 
         if (Message) {
             p.sendMessage("", this.name, this.Syntaxinate(this.core.getServer().getPlayer(p.name), this.config.getString("Group.Message.Join")));
@@ -182,6 +196,7 @@ public class ChatGroup extends Chat {
         }
         
         this.Save();
+        p.Save();
 
         if (Message && p.Online()) {
             p.sendMessage("", this.name, this.Syntaxinate(this.core.getServer().getPlayer(p.name), this.config.getString("Group.Message.Leave")));
