@@ -36,7 +36,11 @@ public class mute implements GroupCommand {
                 pcpe.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
             }
         }else if("group".equalsIgnoreCase(args.get(0))) {
-            
+            if(this.core.api.Has(pcpe.getPlayer(), "groupchat.mute.group")) {
+                this.core.players.get(pcpe.getPlayer().getName()).toggleGroupMute(args.get(1));
+            }else {
+                pcpe.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
+            }
         }else{
             pcpe.getPlayer().sendMessage(ChatColor.RED + "/mute <player or group> <name>");
         }

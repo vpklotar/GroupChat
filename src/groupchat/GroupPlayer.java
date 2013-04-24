@@ -92,7 +92,7 @@ public class GroupPlayer implements Listener {
             this.mutedGroups.add(groupName); // Add to mute list
 
             if (this.Online()) {
-                this.sendMessage(this.name, "", ChatColor.BLUE + "Group " + groupName + " is now umuted!");
+                this.sendMessage(this.name, "", ChatColor.BLUE + "Group " + groupName + " is now muted!");
             }
         }
         this.Save();
