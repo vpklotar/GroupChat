@@ -15,11 +15,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
  * @author Tim
  */
 public class mute implements GroupCommand {
-    private Core core; // Core refrence for permissions checking
-    
-    public mute(Core core) {
-        this.core = core;
-    }
     
     @Override
     public int GetMinArgs() {
@@ -30,14 +25,14 @@ public class mute implements GroupCommand {
     public void Process(PlayerCommandPreprocessEvent pcpe, ArrayList<String> args) {
         
         if("player".equalsIgnoreCase(args.get(0))) {
-            if(this.core.api.Has(pcpe.getPlayer(), "groupchat.mute.player")) {
-                this.core.players.get(pcpe.getPlayer().getName()).togglePlayerMute(args.get(1));
+            if(Core.api.Has(pcpe.getPlayer(), "groupchat.mute.player")) {
+                Core.players.get(pcpe.getPlayer().getName()).togglePlayerMute(args.get(1));
             }else {
                 pcpe.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
             }
         }else if("group".equalsIgnoreCase(args.get(0))) {
-            if(this.core.api.Has(pcpe.getPlayer(), "groupchat.mute.group")) {
-                this.core.players.get(pcpe.getPlayer().getName()).toggleGroupMute(args.get(1));
+            if(Core.api.Has(pcpe.getPlayer(), "groupchat.mute.group")) {
+                Core.players.get(pcpe.getPlayer().getName()).toggleGroupMute(args.get(1));
             }else {
                 pcpe.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
             }

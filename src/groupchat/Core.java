@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -24,20 +25,18 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Tim
  */
 public class Core extends JavaPlugin implements Listener {
-    public GroupCoreAPI api;
-    public Config config;
-    //public HashMap<String, ArrayList<String>> PlayerCurrentGroups = new HashMap<>();
-    //public HashMap<String, String> PlayerWritingGroup = new HashMap<>();
-    public HashMap<String, ChatGroup> ChatGroups = new HashMap<>();
-    public HashMap<String, GroupPlayer> players = new HashMap<>();
-    public String DefaultChatGroup;
-    public int DefaultLevel = 1;
+    public static GroupCoreAPI api;
+    public static Config config;
+    public static HashMap<String, ChatGroup> ChatGroups = new HashMap<>();
+    public static HashMap<String, GroupPlayer> players = new HashMap<>();
+    public static String DefaultChatGroup;
+    public static int DefaultLevel = 1;
     
     @Override
     public void onEnable(){
         if(Bukkit.getPluginManager().isPluginEnabled("GroupCore")){
-            this.api = groupcore.Core.GetAPI();
-            this.api.RegisterHook(this);
+            Core.api = groupcore.Core.GetAPI();
+            Core.api.RegisterHook(this);
             
             new PlayerListener(this);
             
@@ -47,7 +46,7 @@ public class Core extends JavaPlugin implements Listener {
             this.setupCommands();
             
         }else{
-            this.info("GroupCore is required!");
+            Core.info("GroupCore is required!");
         }
     }
     
@@ -56,89 +55,93 @@ public class Core extends JavaPlugin implements Listener {
         if(Bukkit.getPluginManager().isPluginEnabled("GroupCore")){
             
             ArrayList<String> s = new ArrayList<>();
-            for(String name : this.ChatGroups.keySet()){
+            for(String name : Core.ChatGroups.keySet()){
                 s.add(name);
             }
-            this.config.SetList("Groups.ChatGroups", s);
+            Core.config.SetList("Groups.ChatGroups", s);
             
-            for(String name : this.players.keySet()) {
-                GroupPlayer p = this.players.get(name);
+            for(String name : Core.players.keySet()) {
+                GroupPlayer p = Core.players.get(name);
                 p.Save();
             }
             
-            this.config.save();
+            Core.config.save();
         }
     }
     
     public void SetupConfigs(){
-        this.config = this.api.GetExtentionConfig(this, "config");
+        Core.config = this.api.GetExtentionConfig(this, "config");
         
-        this.config.setDefault("ChatInServer", "true");
+        Core.config.setDefault("ChatInServer", "true");
         
-        this.config.setDefault("Format.ChatColorsEnabled", "true");
-        this.config.setDefault("Format.Syntax", "(%level%)&f[&b%group%&f] &a%username%: &f%message%");
+        Core.config.setDefault("Format.ChatColorsEnabled", "true");
+        Core.config.setDefault("Format.Syntax", "(%level%)&f[&b%group%&f] &a%username%: &f%message%");
         
-        this.config.setDefault("Groups.Default", "Default");
-        this.config.setDefault("Groups.AutoJoinGroupByLevel", "true");
-        this.config.setDefault("Groups.DefaultLevel", "1");
+        Core.config.setDefault("Groups.Default", "Default");
+        Core.config.setDefault("Groups.AutoJoinGroupByLevel", "true");
+        Core.config.setDefault("Groups.DefaultLevel", "1");
         
         ArrayList<String> groups = new ArrayList<>();
         groups.add("Default");
         
-        this.config.SetDefaultList("Groups.ChatGroups", groups);
+        Core.config.SetDefaultList("Groups.ChatGroups", groups);
         
-        this.config.save();
+        Core.config.save();
         
-        this.DefaultChatGroup = this.config.getString("Groups.Default");
-        this.DefaultLevel = Integer.parseInt(this.config.getString("Groups.DefaultLevel"));
+        Core.DefaultChatGroup = Core.config.getString("Groups.Default");
+        Core.DefaultLevel = Integer.parseInt(Core.config.getString("Groups.DefaultLevel"));
     }
     
     public void SetupChatGroups(){
-        for(String s : this.config.GetList("Groups.ChatGroups")){
-            this.ChatGroups.put(s, new ChatGroup(this, s));
+        for(String s : Core.config.GetList("Groups.ChatGroups")){
+            Core.ChatGroups.put(s, new ChatGroup(s));
         }
         
-        this.info("Loaded "+this.ChatGroups.size()+" ChatGroups successfully!");
+        Core.info("Loaded "+Core.ChatGroups.size()+" ChatGroups successfully!");
     }
     
     public void setupPlayers() {
         // Load all online players
         for(Player p : this.getServer().getOnlinePlayers()){
-            if(!this.players.containsKey(p.getName())) {
-                this.players.put(p.getName(), new GroupPlayer(this, p.getName()));
+            if(!Core.players.containsKey(p.getName())) {
+                Core.players.put(p.getName(), new GroupPlayer(this, p.getName()));
             }
         }
     }
     
     private void setupCommands() {
-        this.api.GetCommandHandler().RegisterCommand("/G", new G(this));
-        this.api.GetCommandHandler().RegisterCommand("/mute", new mute(this));
+        Core.api.GetCommandHandler().RegisterCommand("/G", new G());
+        Core.api.GetCommandHandler().RegisterCommand("/mute", new mute());
     }
     
-    public String Syntaxinate(String str, HashMap<String, String> replacement){
+    public static String Syntaxinate(String str, HashMap<String, String> replacement){
         String r = str;
         
         for(String key : replacement.keySet()){
             r = r.replaceAll(key, replacement.get(key));
         }
         
-        if("true".equals(this.config.getString("Format.ChatColorsEnabled"))){
-            r = this.api.addColor(r, true);
+        if("true".equals(Core.config.getString("Format.ChatColorsEnabled"))){
+            r = Core.api.addColor(r, true);
         }
         
         return r;
     }
     
-    public void info(String msg){
-        Logger.getLogger("Minecraft").info("["+this.getDescription().getName().toString()+" v. "+this.getDescription().getVersion().toString()+"] "+msg);
+    public static Core getPlugin() {
+        return (Core) Bukkit.getPluginManager().getPlugin("GroupChat");
+    }
+    
+    public static void info(String msg){
+        Logger.getLogger("Minecraft").info("["+Core.getPlugin().getDescription().getName().toString()+" v. "+Core.getPlugin().getDescription().getVersion().toString()+"] "+msg);
     } 
     
-    public ArrayList<ChatGroup> GetAvilableChatGroups(Player p){
+    public static ArrayList<ChatGroup> GetAvilableChatGroups(Player p){
         ArrayList<ChatGroup> r = new ArrayList<>();
         
-        for(String s : this.ChatGroups.keySet()){
-            if(!this.players.get(p.getName()).chatGroups.contains(s) && this.ChatGroups.get(s).HasAccess(p)) {
-                r.add(this.ChatGroups.get(s));
+        for(String s : Core.ChatGroups.keySet()){
+            if(!Core.players.get(p.getName()).chatGroups.contains(s) && Core.ChatGroups.get(s).HasAccess(p)) {
+                r.add(Core.ChatGroups.get(s));
             }
         }
         
@@ -147,15 +150,15 @@ public class Core extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event){
-        if (!this.players.containsKey(event.getPlayer().getName())) {
-            this.players.put(event.getPlayer().getName(), new GroupPlayer(this, event.getPlayer().getName()));
+        if (!Core.players.containsKey(event.getPlayer().getName())) {
+            Core.players.put(event.getPlayer().getName(), new GroupPlayer(this, event.getPlayer().getName()));
         }
     }
     
-    public int GetPlayerLevel(Player p){
+    public static int GetPlayerLevel(Player p){
         
-        if(this.api.Has(p, "groupchat.level")){
-            for(String s : this.api.GetPermissionsManager().overlay.GetNodes(p)){
+        if(Core.api.Has(p, "groupchat.level")){
+            for(String s : Core.api.GetPermissionsManager().overlay.GetNodes(p)){
                 if(s.startsWith("groupchat.level.")){
                     String w = s.replace("groupchat.level.", "");
                     return Integer.parseInt(w);

@@ -12,12 +12,6 @@ import org.bukkit.event.Listener;
  * @author Tim
  */
 public class Chat{
-    protected Core core;
-    
-    // Constructor
-    public Chat(Core core){
-        this.core = core;
-    }
     
     public void SendMessage(String player, String group, GroupPlayer p, String message){
         if(p != null){
@@ -26,6 +20,6 @@ public class Chat{
     }
     
     public void SendMessage(String player, String group, String to, String message){
-        this.SendMessage(player, group, this.core.players.get(to), message);
+        this.SendMessage(player, group, Core.players.get(to), message);
     }
 }
