@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  *
@@ -20,9 +21,9 @@ public class GroupPlayer implements Listener {
     private Config config;
     private Core core;
     public String name = "";
-    private ArrayList<String> mutedPlayers = new ArrayList<String>();
-    private ArrayList<String> mutedGroups = new ArrayList<String>();
-    public ArrayList<String> chatGroups = new ArrayList<String>();
+    private ArrayList<String> mutedPlayers = new ArrayList<>();
+    private ArrayList<String> mutedGroups = new ArrayList<>();
+    public ArrayList<String> chatGroups = new ArrayList<>();
     public String writingGroup = "";
     
     public GroupPlayer(Core core, String name) {
@@ -64,6 +65,17 @@ public class GroupPlayer implements Listener {
             this.core.ChatGroups.get(this.writingGroup).BroadcastMessage(event.getPlayer().getName(), event.getMessage(), true);
             event.setCancelled(true);
         }
+    }
+    
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        /*this.core.info("Player " + this.name + " left, preparing to remove object from refrence!");
+        this.core.players.remove(this.name);
+        try {
+            this.finalize();
+        } catch (Throwable ex) {
+            this.core.info(ex.getMessage());
+        }*/
     }
      
      // End of events

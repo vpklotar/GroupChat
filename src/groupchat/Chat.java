@@ -11,13 +11,12 @@ import org.bukkit.event.Listener;
  *
  * @author Tim
  */
-public class Chat implements Listener{
+public class Chat{
     protected Core core;
     
     // Constructor
     public Chat(Core core){
         this.core = core;
-        this.core.getServer().getPluginManager().registerEvents(this, core);
     }
     
     public void SendMessage(String player, String group, GroupPlayer p, String message){

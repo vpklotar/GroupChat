@@ -9,10 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 /**
  *
@@ -58,9 +55,16 @@ public class ChatGroup extends Chat {
     }
     
     public void BroadcastMessage(String player, String message) {
+        this.RemoveDuplications();
         this.core.info(message);
+        
+        ArrayList<String> sentToPlayer = new ArrayList<>(); // Easy quick fix
+        
         for (String p : this.Players) {
-            this.SendMessage(player, this.name, p, message);
+            if(!sentToPlayer.contains(p)) {
+                this.SendMessage(player, this.name, p, message);
+                sentToPlayer.add(p);
+            }
         }
     }
 
@@ -72,6 +76,7 @@ public class ChatGroup extends Chat {
         if(!this.Players.contains(p)) {
             this.Players.add(p);
         }
+        this.RemoveDuplications();
     }
 
     public String Syntaxinate(Player p, String message) {
@@ -104,6 +109,19 @@ public class ChatGroup extends Chat {
         this.config.save();
 
         this.Players = (ArrayList<String>) this.config.GetList("Players.List");
+        this.RemoveDuplications();
+    }
+    
+    private void RemoveDuplications() {
+        ArrayList<String> temp = new ArrayList<String>();
+        
+        for(String s : this.Players) {
+            if(!temp.contains(s)) {
+                temp.add(s);
+            }
+        }
+        
+        this.Players = temp;
     }
 
     public void Save() {

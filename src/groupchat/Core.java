@@ -104,24 +104,15 @@ public class Core extends JavaPlugin implements Listener {
     public void setupPlayers() {
         // Load all online players
         for(Player p : this.getServer().getOnlinePlayers()){
-            /*if(!this.config.config.contains("Players.List."+p.getName()) || this.config.GetList("Players.List."+p.getName()).isEmpty()){
-                this.ChatGroups.get(this.DefaultChatGroup).Join(p, true);
-            }else{
-                for(String s : this.config.GetList("Players.List."+p.getName())){
-                    this.ChatGroups.get(s).Join(p, false);
-                }
-                
-                this.PlayerWritingGroup.put(p.getName(), this.config.getString("Players."+p.getName()));
-            }*/
-            
-            this.players.put(p.getName(), new GroupPlayer(this, p.getName()));
+            if(!this.players.containsKey(p.getName())) {
+                this.players.put(p.getName(), new GroupPlayer(this, p.getName()));
+            }
         }
     }
     
     private void setupCommands() {
         this.api.GetCommandHandler().RegisterCommand("/G", new G(this));
         this.api.GetCommandHandler().RegisterCommand("/mute", new mute(this));
-        //this.api.GetCommandHandler().RegisterCommand("G", g);
     }
     
     public String Syntaxinate(String str, HashMap<String, String> replacement){
@@ -156,7 +147,9 @@ public class Core extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event){
-        this.setupPlayers();
+        if (!this.players.containsKey(event.getPlayer().getName())) {
+            this.players.put(event.getPlayer().getName(), new GroupPlayer(this, event.getPlayer().getName()));
+        }
     }
     
     public int GetPlayerLevel(Player p){
