@@ -104,7 +104,7 @@ public class Core extends JavaPlugin implements Listener {
         // Load all online players
         for(Player p : this.getServer().getOnlinePlayers()){
             if(!Core.players.containsKey(p.getName())) {
-                Core.players.put(p.getName(), new GroupPlayer(this, p.getName()));
+                Core.players.put(p.getName(), new GroupPlayer(p.getName()));
             }
         }
     }
@@ -122,7 +122,7 @@ public class Core extends JavaPlugin implements Listener {
         }
         
         if("true".equals(Core.config.getString("Format.ChatColorsEnabled"))){
-            r = Core.api.addColor(r, true);
+            r = Core.api.addColor(r);
         }
         
         return r;
@@ -151,7 +151,7 @@ public class Core extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event){
         if (!Core.players.containsKey(event.getPlayer().getName())) {
-            Core.players.put(event.getPlayer().getName(), new GroupPlayer(this, event.getPlayer().getName()));
+            Core.players.put(event.getPlayer().getName(), new GroupPlayer(event.getPlayer().getName()));
         }
     }
     

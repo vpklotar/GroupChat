@@ -56,7 +56,7 @@ public class ChatGroup extends Chat {
     
     public void BroadcastMessage(String player, String message) {
         this.RemoveDuplications();
-        Core.info(message);
+        Core.info(Core.api.removeColor(message));
         
         ArrayList<String> sentToPlayer = new ArrayList<>(); // Easy quick fix
         
@@ -113,7 +113,7 @@ public class ChatGroup extends Chat {
     }
     
     private void RemoveDuplications() {
-        ArrayList<String> temp = new ArrayList<String>();
+        ArrayList<String> temp = new ArrayList<>();
         
         for(String s : this.Players) {
             if(!temp.contains(s)) {
@@ -171,11 +171,15 @@ public class ChatGroup extends Chat {
     }
     
     public void Leave(GroupPlayer p, boolean Message){
+        if(p == null || p.chatGroups == null) {
+            return;
+        }
         p.chatGroups.remove(this.name);
+        Core.info(p.name);
         
         if(p.writingGroup.equals(this.name)) {
             if(p.chatGroups.size() < 1){
-                p.chatGroups.add(name);
+                p.chatGroups.add(Core.DefaultChatGroup);
             }
             p.writingGroup = p.chatGroups.get(0); // If the player had this as it's writing group go back to the first in his index
         }

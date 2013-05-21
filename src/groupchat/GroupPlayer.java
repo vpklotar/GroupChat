@@ -19,24 +19,22 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public class GroupPlayer implements Listener {
     private Config config;
-    private Core core;
     public String name = "";
     private ArrayList<String> mutedPlayers = new ArrayList<>();
     private ArrayList<String> mutedGroups = new ArrayList<>();
     public ArrayList<String> chatGroups = new ArrayList<>();
     public String writingGroup = "";
     
-    public GroupPlayer(Core core, String name) {
-        this.core = core;
+    public GroupPlayer(String name) {
         this.name = name;
-        this.writingGroup = this.core.DefaultChatGroup;
-        this.core.getServer().getPluginManager().registerEvents(this, core);
+        this.writingGroup = Core.DefaultChatGroup;
+        Core.getPlugin().getServer().getPluginManager().registerEvents(this, Core.getPlugin());
         
         this.setupConfigs();
     }
     
     private void setupConfigs() {
-        this.config = this.core.api.GetExtentionConfig(this.core, "Players/"+this.name);
+        this.config = Core.api.GetExtentionConfig(Core.getPlugin(), "Players/"+this.name);
         
         this.config.setDefault("WritingGroup", writingGroup);
         this.config.SetDefaultList("muted.players", mutedPlayers);
@@ -47,6 +45,7 @@ public class GroupPlayer implements Listener {
         
         this.mutedPlayers = (ArrayList<String>) this.config.GetList("muted.players");
         this.mutedGroups = (ArrayList<String>) this.config.GetList("muted.groups");
+        this.writingGroup = this.config.getString("WritingGroup");
     }
     
     public void Save() {
@@ -62,7 +61,7 @@ public class GroupPlayer implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if(event.getPlayer().getName().equals(this.name)) {
-            this.core.ChatGroups.get(this.writingGroup).BroadcastMessage(event.getPlayer().getName(), event.getMessage(), true);
+            Core.ChatGroups.get(this.writingGroup).BroadcastMessage(event.getPlayer().getName(), event.getMessage(), true);
             event.setCancelled(true);
         }
     }
@@ -82,12 +81,12 @@ public class GroupPlayer implements Listener {
     
     void sendMessage(String player, String group, String message) {
         if(this.Online() && !this.mutedPlayers.contains(player) && !this.mutedGroups.contains(group)) { // If the player is online and the origin of the message isn't muted proceed
-            this.core.getServer().getPlayer(this.name).sendMessage(message); // Send the message to the player
+            Core.getPlugin().getServer().getPlayer(this.name).sendMessage(message); // Send the message to the player
         }
     }
     
     public boolean Online() { // Is the player online?
-        Player p  = this.core.getServer().getPlayer(this.name);
+        Player p  = Core.getPlugin().getServer().getPlayer(this.name);
         if(p == null) {
             return false;
         }
