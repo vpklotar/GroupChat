@@ -23,5 +23,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
        this.core.setupPlayers();
+       Core.info("TEST");
     }    
 }

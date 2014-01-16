@@ -9,7 +9,7 @@
 <!-- in the project's Project Properties dialog box.-->
 <project name="GroupChat" default="default" basedir=".">
     <target name="-post-jar">
-        <copy file="${dist.jar}" flatten="true" todir="C:\Users\Tim\Bukkit development\plugins" />
+        <copy file="${dist.jar}" flatten="true" todir="C:\Users\Tim\Desktop\Bukkit dev\plugins" />
     </target>
     <description>Builds, tests, and runs the project GroupChat.</description>
     <import file="nbproject/build-impl.xml"/>
